@@ -130,49 +130,49 @@ All coin symbols are case insensitive, e.g. you can pass `gas_coin='BIP'` or `ga
 - MinterBuyCoinTx
   ```python
   from mintersdk.sdk.transactions import MinterBuyCoinTx
-  tx = MinterBuyCoinTx(coin_to_buy='SYMBOL', value_to_buy=1, coin_to_sell='SYMBOL', max_value_to_sell=2, nonce=1, gas_coin='SYMBOL')
+  tx = MinterBuyCoinTx(coin_to_buy='coin id', value_to_buy=1, coin_to_sell='coin id', max_value_to_sell=2, nonce=1, gas_coin='coin id')
   ```
   
 - MinterCreateCoinTx
   ```python
   from mintersdk.sdk.transactions import MinterCreateCoinTx
-  tx = MinterCreateCoinTx(name='Coin description', symbol='SYMBOL', initial_amount=1.5, initial_reserve=10000, crr=50, max_supply=1000, nonce=1, gas_coin='SYMBOL')
+  tx = MinterCreateCoinTx(name='Coin description', symbol='SYMBOL', initial_amount=1.5, initial_reserve=10000, crr=50, max_supply=1000, nonce=1, gas_coin='coin id')
   ```
   
 - MinterDeclareCandidacyTx
   ```python
   from mintersdk.sdk.transactions import MinterDeclareCandidacyTx
-  tx = MinterDeclareCandidacyTx(address='Mx...', pub_key='Mp...', commission=1, coin='SYMBOL', stake=100, nonce=1, gas_coin='SYMBOL')
+  tx = MinterDeclareCandidacyTx(address='Mx...', pub_key='Mp...', commission=1, coin='coin id', stake=100, nonce=1, gas_coin='coin id')
   ```
   
 - MinterDelegateTx
   ```python
   from mintersdk.sdk.transactions import MinterDelegateTx
-  tx = MinterDelegateTx(pub_key='Mp...', coin='SYMBOL', stake=100, nonce=1, gas_coin='SYMBOL')
+  tx = MinterDelegateTx(pub_key='Mp...', coin='coin id', stake=100, nonce=1, gas_coin='coin id')
   ```
   
 - MinterRedeemCheckTx
   ```python
   from mintersdk.sdk.transactions import MinterRedeemCheckTx
-  tx = MinterRedeemCheckTx(check='check hash str', proof='proof hash str', nonce=1, gas_coin='SYMBOL')
+  tx = MinterRedeemCheckTx(check='check hash str', proof='proof hash str', nonce=1, gas_coin='coin id')
   ```
   
 - MinterSellAllCoinTx
   ```python
   from mintersdk.sdk.transactions import MinterSellAllCoinTx
-  tx = MinterSellAllCoinTx(coin_to_sell='SYMBOL', coin_to_buy='SYMBOL', min_value_to_buy=100, nonce=1, gas_coin='SYMBOL')
+  tx = MinterSellAllCoinTx(coin_to_sell='coin id', coin_to_buy='coin id', min_value_to_buy=100, nonce=1, gas_coin='coin id')
   ```
   
 - MinterSellCoinTx
   ```python
   from mintersdk.sdk.transactions import MinterSellCoinTx
-  tx = MinterSellCoinTx(coin_to_sell='SYMBOL', value_to_sell=1, coin_to_buy='SYMBOL', min_value_to_buy=2, nonce=1, gas_coin='SYMBOL')
+  tx = MinterSellCoinTx(coin_to_sell='coin id', value_to_sell=1, coin_to_buy='coin id', min_value_to_buy=2, nonce=1, gas_coin='coin id')
   ```
   
 - MinterSendCoinTx
   ```python
   from mintersdk.sdk.transactions import MinterSendCoinTx
-  tx = MinterSendCoinTx(coin='SYMBOL', to='Mx...', value=5, nonce=1, gas_coin='SYMBOL')
+  tx = MinterSendCoinTx(coin='coin id', to='Mx...', value=5, nonce=1, gas_coin='coin id')
   ```
   
 - MinterMultiSendCoinTx
@@ -180,41 +180,41 @@ All coin symbols are case insensitive, e.g. you can pass `gas_coin='BIP'` or `ga
   from mintersdk.sdk.transactions import MinterMultiSendCoinTx
   
   txs = [
-      {'coin': 'SYMBOL', 'to': 'Mx..1', 'value': 5},
-      {'coin': 'SYMBOL', 'to': 'Mx..2', 'value': 1},
-      {'coin': 'SYMBOL', 'to': 'Mx..3', 'value': 4}
+      {'coin': 'coin id', 'to': 'Mx..1', 'value': 5},
+      {'coin': 'coin id', 'to': 'Mx..2', 'value': 1},
+      {'coin': 'coin id', 'to': 'Mx..3', 'value': 4}
   ]
-  tx = MinterMultiSendCoinTx(txs=txs, nonce=1, gas_coin='SYMBOL')
+  tx = MinterMultiSendCoinTx(txs=txs, nonce=1, gas_coin='coin id')
   ```
   
 - MinterSetCandidateOffTx
   ```python
   from mintersdk.sdk.transactions import MinterSetCandidateOffTx
-  tx = MinterSetCandidateOffTx(pub_key='Mp...', nonce=1, gas_coin='SYMBOL')
+  tx = MinterSetCandidateOffTx(pub_key='Mp...', nonce=1, gas_coin='coin id')
   ```
   
 - MinterSetCandidateOnTx
   ```python
   from mintersdk.sdk.transactions import MinterSetCandidateOnTx
-  tx = MinterSetCandidateOnTx(pub_key='Mp...', nonce=1, gas_coin='SYMBOL')
+  tx = MinterSetCandidateOnTx(pub_key='Mp...', nonce=1, gas_coin='coin id')
   ```
   
 - MinterUnbondTx
   ```python
   from mintersdk.sdk.transactions import MinterUnbondTx
-  tx = MinterUnbondTx(pub_key='Mp...', coin='SYMBOL', value=100, nonce=1, gas_coin='SYMBOL')
+  tx = MinterUnbondTx(pub_key='Mp...', coin='coin id', value=100, nonce=1, gas_coin='coin id')
   ```
   
 - MinterEditCandidateTx
   ```python
   from mintersdk.sdk.transactions import MinterEditCandidateTx
-  tx = MinterEditCandidateTx(pub_key='Mp...', reward_address='Mx...', owner_address='Mx...', nonce=1, gas_coin='SYMBOL')
+  tx = MinterEditCandidateTx(pub_key='Mp...', reward_address='Mx...', owner_address='Mx...', nonce=1, gas_coin='coin id')
   ```
   
 - MinterCreateMultisigTx
   ```python
   from mintersdk.sdk.transactions import MinterCreateMultisigTx
-  tx = MinterCreateMultisigTx(threshold=5, weights=[1, 2, 3], addresses=['Mx...', 'Mx...', 'Mx...'], nonce=1, gas_coin='SYMBOL')
+  tx = MinterCreateMultisigTx(threshold=5, weights=[1, 2, 3], addresses=['Mx...', 'Mx...', 'Mx...'], nonce=1, gas_coin='coin id')
   ```
 
 
