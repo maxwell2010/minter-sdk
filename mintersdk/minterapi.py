@@ -253,6 +253,26 @@ class MinterAPI(object):
 
         return response
 
+    def get_coin_info_by_id(self, id, height=None, pip2bip=False):
+        """
+        Get information about coin
+        Args:
+            symbol (string): coin name
+            height (int): block height
+            pip2bip (bool): Convert coin amounts to BIP (default is in PIP)
+        """
+        response = self._request(
+            command='coin_info',
+            params={'id': id, 'height': height}
+        )
+
+        if pip2bip:
+            return self.__response_processor(
+                data=response, funcs=[self.__pip_to_bip]
+            )
+
+        return response
+
     def estimate_coin_sell(self, coin_to_sell, value_to_sell, coin_to_buy,
                            height=None, pip2bip=False):
         """

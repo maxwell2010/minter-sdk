@@ -51,7 +51,10 @@ Values are `Decimal` type after conversion.
   Returns list of candidates.
   
 - `get_coin_info(symbol, height=None, pip2bip=False)`  
-  Returns information about coin. Note: this method does not return information about base coins (MNT and BIP).
+  Returns information about coin.
+  
+- `get_coin_info_by_id(id, height=None, pip2bip=False)`  
+  Returns information about coin.
   
 - `get_events(height, pip2bip=False)`  
   Returns events at given height.

@@ -70,7 +70,7 @@ class MinterTx(object):
         # Set every tx attributes
         self.nonce = nonce
         self.chain_id = chain_id
-        self.gas_coin = gas_coin.upper()
+        self.gas_coin = int(gas_coin)
         self.gas_price = gas_price
         self.payload = payload
         self.service_data = service_data
@@ -245,7 +245,7 @@ class MinterTx(object):
             'nonce': self.nonce,
             'chain_id': self.chain_id,
             'gas_price': self.gas_price,
-            'gas_coin': MinterHelper.encode_coin_name(self.gas_coin),
+            'gas_coin': self.gas_coin,
             'payload': self.payload,
             'service_data': self.service_data,
             'signature_type': self.signature_type
@@ -261,7 +261,7 @@ class MinterTx(object):
         """
 
         structure.update({
-            'gas_coin': MinterHelper.decode_coin_name(structure['gas_coin'])
+            'gas_coin': structure['gas_coin']
         })
 
         return structure
@@ -316,7 +316,7 @@ class MinterTx(object):
             'nonce': int.from_bytes(tx[0], 'big'),
             'chain_id': int.from_bytes(tx[1], 'big'),
             'gas_price': int.from_bytes(tx[2], 'big'),
-            'gas_coin': tx[3].decode(),
+            'gas_coin': int.from_bytes(tx[3], 'big'),
             'type': int.from_bytes(tx[4], 'big'),
             'payload': payload,
             'service_data': service_data,
@@ -539,17 +539,17 @@ class MinterBuyCoinTx(MinterTx):
                  max_value_to_sell, **kwargs):
         """
         Args:
-            coin_to_buy (str): coin name to buy
+            coin_to_buy (int): coin name to buy
             value_to_buy (float|int): how much coin to buy (BIP)
-            coin_to_sell (str): coin name to sell
+            coin_to_sell (int): coin name to sell
             max_value_to_sell (float|int): max amount to sell (BIP)
         """
 
         super().__init__(**kwargs)
 
-        self.coin_to_buy = coin_to_buy.upper()
+        self.coin_to_buy = coin_to_buy
         self.value_to_buy = value_to_buy
-        self.coin_to_sell = coin_to_sell.upper()
+        self.coin_to_sell = coin_to_sell
         self.max_value_to_sell = max_value_to_sell
 
     def _structure_from_instance(self):
@@ -560,9 +560,9 @@ class MinterBuyCoinTx(MinterTx):
         struct.update({
             'type': self.TYPE,
             'data': {
-                'coin_to_buy': MinterHelper.encode_coin_name(self.coin_to_buy),
+                'coin_to_buy': int(self.coin_to_buy),
                 'value_to_buy': MinterHelper.to_pip(self.value_to_buy),
-                'coin_to_sell': MinterHelper.encode_coin_name(self.coin_to_sell),
+                'coin_to_sell': int(self.coin_to_sell),
                 'max_value_to_sell': MinterHelper.to_pip(self.max_value_to_sell)
             }
         })
@@ -578,15 +578,11 @@ class MinterBuyCoinTx(MinterTx):
         # Convert data values to verbose.
         # Data will be passed as additional kwarg
         kwargs['data'].update({
-            'coin_to_buy': MinterHelper.decode_coin_name(
-                kwargs['data']['coin_to_buy']
-            ),
+            'coin_to_buy': kwargs['data']['coin_to_buy'],
             'value_to_buy': MinterHelper.to_bip(
                 int.from_bytes(kwargs['data']['value_to_buy'], 'big')
             ),
-            'coin_to_sell': MinterHelper.decode_coin_name(
-                kwargs['data']['coin_to_sell']
-            ),
+            'coin_to_sell': kwargs['data']['coin_to_sell'],
             'max_value_to_sell': MinterHelper.to_bip(
                 int.from_bytes(kwargs['data']['max_value_to_sell'], 'big')
             )
@@ -601,9 +597,9 @@ class MinterBuyCoinTx(MinterTx):
     def _data_from_raw(cls, raw_data):
         """ Parent method implementation """
         return {
-            'coin_to_buy': raw_data[0],
+            'coin_to_buy': int.from_bytes(raw_data[0], 'big'),
             'value_to_buy': raw_data[1],
-            'coin_to_sell': raw_data[2],
+            'coin_to_sell': int.from_bytes(raw_data[2], 'big'),
             'max_value_to_sell': raw_data[3]
         }
 
@@ -631,7 +627,7 @@ class MinterCreateCoinTx(MinterTx):
         super().__init__(**kwargs)
 
         self.name = name
-        self.symbol = symbol.upper()
+        self.symbol = symbol
         self.initial_amount = initial_amount
         self.initial_reserve = initial_reserve
         self.crr = crr
@@ -712,7 +708,7 @@ class MinterDeclareCandidacyTx(MinterTx):
             address (str): candidate address
             pub_key (str): candidate public key
             commission (int): candidate commission
-            coin (str): coin name
+            coin (int): coin name
             stake (float|int): stake in BIP
         """
 
@@ -721,7 +717,7 @@ class MinterDeclareCandidacyTx(MinterTx):
         self.address = address
         self.pub_key = pub_key
         self.commission = '' if commission == 0 else commission
-        self.coin = coin.upper()
+        self.coin = coin
         self.stake = stake
 
     def _structure_from_instance(self):
@@ -739,7 +735,7 @@ class MinterDeclareCandidacyTx(MinterTx):
                     MinterHelper.prefix_remove(self.pub_key)
                 ),
                 'commission': '' if self.commission == 0 else self.commission,
-                'coin': MinterHelper.encode_coin_name(self.coin),
+                'coin': int(self.coin),
                 'stake': MinterHelper.to_pip(self.stake)
             }
         })
@@ -762,7 +758,7 @@ class MinterDeclareCandidacyTx(MinterTx):
                 kwargs['data']['pub_key'].hex(), PREFIX_PUBKEY
             ),
             'commission': int.from_bytes(kwargs['data']['commission'], 'big'),
-            'coin': MinterHelper.decode_coin_name(kwargs['data']['coin']),
+            'coin': kwargs['data']['coin'],
             'stake': MinterHelper.to_bip(
                 int.from_bytes(kwargs['data']['stake'], 'big')
             )
@@ -780,7 +776,7 @@ class MinterDeclareCandidacyTx(MinterTx):
             'address': raw_data[0],
             'pub_key': raw_data[1],
             'commission': raw_data[2],
-            'coin': raw_data[3],
+            'coin': int.from_bytes(raw_data[3], 'big'),
             'stake': raw_data[4]
         }
 
@@ -798,7 +794,7 @@ class MinterDelegateTx(MinterTx):
         super().__init__(**kwargs)
 
         self.pub_key = pub_key
-        self.coin = coin.upper()
+        self.coin = coin
         self.stake = stake
 
     def _structure_from_instance(self):
@@ -812,7 +808,7 @@ class MinterDelegateTx(MinterTx):
                 'pub_key': bytes.fromhex(
                     MinterHelper.prefix_remove(self.pub_key)
                 ),
-                'coin': MinterHelper.encode_coin_name(self.coin),
+                'coin': int(self.coin),
                 'stake': MinterHelper.to_pip(self.stake)
             }
         })
@@ -830,7 +826,7 @@ class MinterDelegateTx(MinterTx):
             'pub_key': MinterHelper.prefix_add(
                 kwargs['data']['pub_key'].hex(), PREFIX_PUBKEY
             ),
-            'coin': MinterHelper.decode_coin_name(kwargs['data']['coin']),
+            'coin': kwargs['data']['coin'],
             'stake': MinterHelper.to_bip(
                 int.from_bytes(kwargs['data']['stake'], 'big')
             )
@@ -846,7 +842,7 @@ class MinterDelegateTx(MinterTx):
         """ Parent method implementation """
         return {
             'pub_key': raw_data[0],
-            'coin': raw_data[1],
+            'coin': int.from_bytes(raw_data[1], 'big'),
             'stake': raw_data[2]
         }
 
@@ -928,15 +924,15 @@ class MinterSellAllCoinTx(MinterTx):
     def __init__(self, coin_to_sell, coin_to_buy, min_value_to_buy, **kwargs):
         """
         Args:
-            coin_to_sell (str)
-            coin_to_buy (str)
+            coin_to_sell (int)
+            coin_to_buy (int)
             min_value_to_buy (float|int): BIP
         """
 
         super().__init__(**kwargs)
 
-        self.coin_to_sell = coin_to_sell.upper()
-        self.coin_to_buy = coin_to_buy.upper()
+        self.coin_to_sell = coin_to_sell
+        self.coin_to_buy = coin_to_buy
         self.min_value_to_buy = min_value_to_buy
 
     def _structure_from_instance(self):
@@ -947,8 +943,8 @@ class MinterSellAllCoinTx(MinterTx):
         struct.update({
             'type': self.TYPE,
             'data': {
-                'coin_to_sell': MinterHelper.encode_coin_name(self.coin_to_sell),
-                'coin_to_buy': MinterHelper.encode_coin_name(self.coin_to_buy),
+                'coin_to_sell': int(self.coin_to_sell),
+                'coin_to_buy': int(self.coin_to_buy),
                 'min_value_to_buy': MinterHelper.to_pip(self.min_value_to_buy)
             }
         })
@@ -964,12 +960,8 @@ class MinterSellAllCoinTx(MinterTx):
         # Convert data values to verbose.
         # Data will be passed as additional kwarg
         kwargs['data'].update({
-            'coin_to_sell': MinterHelper.decode_coin_name(
-                kwargs['data']['coin_to_sell']
-            ),
-            'coin_to_buy': MinterHelper.decode_coin_name(
-                kwargs['data']['coin_to_buy']
-            ),
+            'coin_to_sell': kwargs['data']['coin_to_sell'],
+            'coin_to_buy': kwargs['data']['coin_to_buy'],
             'min_value_to_buy': MinterHelper.to_bip(
                 int.from_bytes(kwargs['data']['min_value_to_buy'], 'big')
             )
@@ -984,8 +976,8 @@ class MinterSellAllCoinTx(MinterTx):
     def _data_from_raw(cls, raw_data):
         """ Parent method implementation """
         return {
-            'coin_to_sell': raw_data[0],
-            'coin_to_buy': raw_data[1],
+            'coin_to_sell': int.from_bytes(raw_data[0], 'big'),
+            'coin_to_buy': int.from_bytes(raw_data[1], 'big'),
             'min_value_to_buy': raw_data[2]
         }
 
@@ -1003,17 +995,17 @@ class MinterSellCoinTx(MinterTx):
                  min_value_to_buy, **kwargs):
         """
         Args:
-            coin_to_sell (str)
+            coin_to_sell (int)
             value_to_sell (float|int): BIP
-            coin_to_buy (str)
+            coin_to_buy (int)
             min_value_to_buy (float|int): BIP
         """
 
         super().__init__(**kwargs)
 
-        self.coin_to_sell = coin_to_sell.upper()
+        self.coin_to_sell = coin_to_sell
         self.value_to_sell = value_to_sell
-        self.coin_to_buy = coin_to_buy.upper()
+        self.coin_to_buy = coin_to_buy
         self.min_value_to_buy = min_value_to_buy
 
     def _structure_from_instance(self):
@@ -1024,9 +1016,9 @@ class MinterSellCoinTx(MinterTx):
         struct.update({
             'type': self.TYPE,
             'data': {
-                'coin_to_sell': MinterHelper.encode_coin_name(self.coin_to_sell),
+                'coin_to_sell': int(self.coin_to_sell),
                 'value_to_sell': MinterHelper.to_pip(self.value_to_sell),
-                'coin_to_buy': MinterHelper.encode_coin_name(self.coin_to_buy),
+                'coin_to_buy': int(self.coin_to_buy),
                 'min_value_to_buy': MinterHelper.to_pip(self.min_value_to_buy)
             }
         })
@@ -1042,15 +1034,11 @@ class MinterSellCoinTx(MinterTx):
         # Convert data values to verbose.
         # Data will be passed as additional kwarg
         kwargs['data'].update({
-            'coin_to_sell': MinterHelper.decode_coin_name(
-                kwargs['data']['coin_to_sell']
-            ),
+            'coin_to_sell': kwargs['data']['coin_to_sell'],
             'value_to_sell': MinterHelper.to_bip(
                 int.from_bytes(kwargs['data']['value_to_sell'], 'big')
             ),
-            'coin_to_buy': MinterHelper.decode_coin_name(
-                kwargs['data']['coin_to_buy']
-            ),
+            'coin_to_buy': kwargs['data']['coin_to_buy'],
             'min_value_to_buy': MinterHelper.to_bip(
                 int.from_bytes(kwargs['data']['min_value_to_buy'], 'big')
             )
@@ -1065,9 +1053,9 @@ class MinterSellCoinTx(MinterTx):
     def _data_from_raw(cls, raw_data):
         """ Parent method implementation """
         return {
-            'coin_to_sell': raw_data[0],
+            'coin_to_sell': int.from_bytes(raw_data[0], 'big'),
             'value_to_sell': raw_data[1],
-            'coin_to_buy': raw_data[2],
+            'coin_to_buy': int.from_bytes(raw_data[2], 'big'),
             'min_value_to_buy': raw_data[3]
         }
 
@@ -1084,7 +1072,7 @@ class MinterSendCoinTx(MinterTx):
     def __init__(self, coin, to, value, **kwargs):
         super().__init__(**kwargs)
 
-        self.coin = coin.upper()
+        self.coin = coin
         self.to = to
         self.value = value
 
@@ -1096,7 +1084,7 @@ class MinterSendCoinTx(MinterTx):
         struct.update({
             'type': self.TYPE,
             'data': {
-                'coin': MinterHelper.encode_coin_name(self.coin),
+                'coin': int(self.coin),
                 'to': bytes.fromhex(MinterHelper.prefix_remove(self.to)),
                 'value': MinterHelper.to_pip(self.value)
             }
@@ -1113,7 +1101,7 @@ class MinterSendCoinTx(MinterTx):
         # Convert data values to verbose.
         # Data will be passed as additional kwarg
         kwargs['data'].update({
-            'coin': MinterHelper.decode_coin_name(kwargs['data']['coin']),
+            'coin': kwargs['data']['coin'],
             'to': MinterHelper.prefix_add(
                 kwargs['data']['to'].hex(), PREFIX_ADDR
             ),
@@ -1131,7 +1119,7 @@ class MinterSendCoinTx(MinterTx):
     def _data_from_raw(cls, raw_data):
         """ Parent method implementation """
         return {
-            'coin': raw_data[0],
+            'coin': int.from_bytes(raw_data[0], 'big'),
             'to': raw_data[1],
             'value': raw_data[2]
         }
@@ -1184,7 +1172,7 @@ class MinterMultiSendCoinTx(MinterTx):
         # Populate multi data from each single tx.
         for item in self.txs:
             struct['data']['txs'].append([
-                MinterHelper.encode_coin_name(item['coin'].upper()),
+                int(item['coin']),
                 bytes.fromhex(MinterHelper.prefix_remove(item['to'])),
                 MinterHelper.to_pip(item['value'])
             ])
@@ -1201,7 +1189,7 @@ class MinterMultiSendCoinTx(MinterTx):
         # Data will be passed as additional kwarg
         for index, item in enumerate(kwargs['data']['txs']):
             kwargs['data']['txs'][index] = {
-                'coin': MinterHelper.decode_coin_name(item[0]),
+                'coin': item[0],
                 'to': MinterHelper.prefix_add(item[1].hex(), PREFIX_ADDR),
                 'value': MinterHelper.to_bip(int.from_bytes(item[2], 'big'))
             }
@@ -1358,14 +1346,14 @@ class MinterUnbondTx(MinterTx):
         """
         Args:
             pub_key (str)
-            coin (str)
+            coin (int)
             value (float|int): BIP
         """
 
         super().__init__(**kwargs)
 
         self.pub_key = pub_key
-        self.coin = coin.upper()
+        self.coin = coin
         self.value = value
 
     def _structure_from_instance(self):
@@ -1379,7 +1367,7 @@ class MinterUnbondTx(MinterTx):
                 'pub_key': bytes.fromhex(
                     MinterHelper.prefix_remove(self.pub_key)
                 ),
-                'coin': MinterHelper.encode_coin_name(self.coin),
+                'coin': int(self.coin),
                 'value': MinterHelper.to_pip(self.value)
             }
         })
@@ -1398,7 +1386,7 @@ class MinterUnbondTx(MinterTx):
             'pub_key': MinterHelper.prefix_add(
                 kwargs['data']['pub_key'].hex(), PREFIX_PUBKEY
             ),
-            'coin': MinterHelper.decode_coin_name(kwargs['data']['coin']),
+            'coin': kwargs['data']['coin'],
             'value': MinterHelper.to_bip(
                 int.from_bytes(kwargs['data']['value'], 'big')
             )
@@ -1414,7 +1402,7 @@ class MinterUnbondTx(MinterTx):
         """ Parent method implementation """
         return {
             'pub_key': raw_data[0],
-            'coin': raw_data[1],
+            'coin': int.from_bytes(raw_data[1], 'big'),
             'value': raw_data[2]
         }
 
