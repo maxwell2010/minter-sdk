@@ -365,10 +365,10 @@ qr_code_filepath = MinterHelper.generate_qr(text=url_link)
 from mintersdk.sdk.check import MinterCheck
 
 # Create check without password
-check = MinterCheck(nonce=1, due_block=300000, coin='MNT', value=1, gas_coin='MNT')
+check = MinterCheck(nonce=1, due_block=300000, coin='coinid', value=1, gas_coin='coinid')
 
 # Or create check with password
-check = MinterCheck(nonce=1, due_block=300000, coin='MNT', value=1, gas_coin='MNT', passphrase='pass')
+check = MinterCheck(nonce=1, due_block=300000, coin='coinid', value=1, gas_coin='coinid', passphrase='pass')
 
 # Sign check
 signed_check = check.sign(private_key='PRIVATE_KEY')
@@ -388,7 +388,7 @@ proof = MinterCheck.proof(address='Mx...', passphrase='pass')
 from mintersdk.sdk.check import MinterCheck
 
 # Create and sign check
-check = MinterCheck(nonce=1, due_block=300000, coin='MNT', value=1, gas_coin='MNT')
+check = MinterCheck(nonce=1, due_block=300000, coin='coinid', value=1, gas_coin='coinid')
 signed_check = check.sign(private_key='PRIVATE_KEY')
 
 # Create object from signed check
