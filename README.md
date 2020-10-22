@@ -324,7 +324,7 @@ tx = MinterTx.from_raw(raw_tx='...')
 Let's create a MinterSendCoinTx
 ```python
 from mintersdk.sdk.transactions import MinterSendCoinTx
-tx = MinterSendCoinTx(coin='BIP', to='Mx18467bbb64a8edf890201d526c35957d82be3d95', value=1.23456789, nonce=1, gas_coin='MNT', gas_price=1, payload='Hello World')
+tx = MinterSendCoinTx(coin='coinid', to='Mx18467bbb64a8edf890201d526c35957d82be3d95', value=1.23456789, nonce=1, gas_coin='coinid', gas_price=1, payload='Hello World')
 ```
 
 Now it's time to create deeplink
@@ -340,7 +340,7 @@ After deeplink object is created, you can override it's attributes, e.g.
 ```python
 dl = MinterDeeplink(tx=tx)
 dl.nonce = ''
-dl.gas_coin = 'MNT'
+dl.gas_coin = 'coinid'
 dl.gas_price = 10
 ```
 
@@ -368,10 +368,10 @@ qr_code_filepath = MinterHelper.generate_qr(text=url_link)
 from mintersdk.sdk.check import MinterCheck
 
 # Create check without password
-check = MinterCheck(nonce=1, due_block=300000, coin='MNT', value=1, gas_coin='MNT')
+check = MinterCheck(nonce=1, due_block=300000, coin='coinid', value=1, gas_coin='coinid')
 
 # Or create check with password
-check = MinterCheck(nonce=1, due_block=300000, coin='MNT', value=1, gas_coin='MNT', passphrase='pass')
+check = MinterCheck(nonce=1, due_block=300000, coin='coinid', value=1, gas_coin='coinid', passphrase='pass')
 
 # Sign check
 signed_check = check.sign(private_key='PRIVATE_KEY')
@@ -391,7 +391,7 @@ proof = MinterCheck.proof(address='Mx...', passphrase='pass')
 from mintersdk.sdk.check import MinterCheck
 
 # Create and sign check
-check = MinterCheck(nonce=1, due_block=300000, coin='MNT', value=1, gas_coin='MNT')
+check = MinterCheck(nonce=1, due_block=300000, coin='coinid', value=1, gas_coin='coinid')
 signed_check = check.sign(private_key='PRIVATE_KEY')
 
 # Create object from signed check
