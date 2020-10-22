@@ -21,18 +21,18 @@ class MinterCheck(object):
         Args:
             nonce (int)
             due_block (int)
-            coin (str)
+            coin (int)
             value (float)
-            gas_coin (str): Gas coin symbol
+            gas_coin (int): Gas coin id
             passphrase (str)
             chain_id (int)
         """
 
         self.nonce = nonce
         self.due_block = due_block
-        self.coin = coin.upper()
+        self.coin = int(coin)
         self.value = value
-        self.gas_coin = gas_coin.upper()
+        self.gas_coin = int(gas_coin)
         self.passphrase = passphrase
         self.chain_id = chain_id
 
@@ -81,9 +81,9 @@ class MinterCheck(object):
             int(str(self.nonce).encode().hex(), 16),
             self.chain_id,
             self.due_block,
-            MinterHelper.encode_coin_name(self.coin),
+            self.coin,
             MinterHelper.to_pip(self.value),
-            MinterHelper.encode_coin_name(self.gas_coin)
+            self.gas_coin
         ]
 
         # Create msg hash
@@ -163,9 +163,9 @@ class MinterCheck(object):
             'nonce': int(decoded[0].decode()),
             'chain_id': int.from_bytes(decoded[1], 'big'),
             'due_block': int.from_bytes(decoded[2], 'big'),
-            'coin': MinterHelper.decode_coin_name(decoded[3]),
+            'coin': int.from_bytes(decoded[3], 'big'),
             'value': MinterHelper.to_bip(int.from_bytes(decoded[4], 'big')),
-            'gas_coin': MinterHelper.decode_coin_name(decoded[5]),
+            'gas_coin': int.from_bytes(decoded[5], 'big'),
             'lock': decoded[6].hex(),
             'signature': {
                 'v': int.from_bytes(decoded[7], 'big'),
@@ -180,9 +180,9 @@ class MinterCheck(object):
             int(str(check.nonce).encode().hex(), 16),
             check.chain_id,
             check.due_block,
-            MinterHelper.encode_coin_name(check.coin),
+            check.coin,
             MinterHelper.to_pip(check.value),
-            MinterHelper.encode_coin_name(check.gas_coin),
+            check.gas_coin,
             bytes.fromhex(check.lock)
         ])
         public_key = ECDSA.recover(msg_hash, tuple(check.signature.values()))
